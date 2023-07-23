@@ -1,8 +1,9 @@
 from typing import Optional, List
 
-from src.db.base_class import Base
 from sqlalchemy import String, ForeignKey, Integer
 from sqlalchemy.orm import mapped_column, relationship, Mapped
+
+from src.db.base_class import Base
 
 
 class Menu(Base):

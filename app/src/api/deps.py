@@ -1,10 +1,10 @@
 from typing import Generator, Any
 
-from sqlalchemy.orm import Session
 from fastapi import Request, Depends
+from sqlalchemy.orm import Session
 
-from src.db.session import SessionLocal
 from src import crud
+from src.db.session import SessionLocal
 from src.models import Menu, SubMenu
 
 

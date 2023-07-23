@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from src import crud
-from src.schemas import SubMenuCreate, SubMenuRead, SubMenuUpdate
 from src.api.deps import get_db, get_menu_model, get_menu_id
 from src.models import Menu
+from src.schemas import SubMenuCreate, SubMenuRead, SubMenuUpdate
 
 router = APIRouter()
 

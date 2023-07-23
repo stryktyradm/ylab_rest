@@ -1,10 +1,10 @@
 from typing import Any, TypeVar, Generic, Type
 
-from sqlalchemy.orm import Session
-from pydantic import BaseModel
 from fastapi import HTTPException, status
-from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
 from src.db.base import Base
 
@@ -23,11 +23,11 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return self.schema.parse_obj(jsonable_encoder(item))
 
     def get(self, db: Session, id_: Any, in_db: bool = False) -> ReadSchemaType | ModelType:
-        db_obj = db.query(self.model).filter(self.model.id == id_).first()
+        db_obj = db.query(self.model).get(id_)
         if not db_obj:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"{self.model.__name__.lower()} not found"
+                detail=f"{self.model.__tablename__} not found"
             )
         if in_db:
             return db_obj
@@ -50,10 +50,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     def update(self, db: Session, id_: Any, obj_in: UpdateSchemaType) -> ReadSchemaType:
         db_obj = self.get(db=db, id_=id_, in_db=True)
         obj_data = jsonable_encoder(db_obj)
-        if isinstance(obj_in, dict):
-            update_data = obj_in
-        else:
-            update_data = obj_in.dict(exclude_unset=True)
+        update_data = obj_in.dict(exclude_unset=True)
         for field in obj_data:
             if field in update_data:
                 setattr(db_obj, field, update_data[field])
@@ -63,13 +60,13 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         item = self.process_data_from_db(db_obj)
         return item
 
-    def delete(self, db: Session, id_: int):
+    def delete(self, db: Session, id_: int) -> JSONResponse:
         db_obj = self.get(db=db, id_=id_, in_db=True)
         db.delete(db_obj)
         db.commit()
         return JSONResponse(
             content={
                 "status": True,
-                "message": f"The {self.model.__name__.lower()} has been deleted"
+                "message": f"The {self.model.__tablename__} has been deleted"
             }
         )
