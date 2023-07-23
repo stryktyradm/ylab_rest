@@ -1,4 +1,4 @@
-from typing import Generator
+from typing import Generator, Any
 
 from sqlalchemy.orm import Session
 from fastapi import Request, Depends
@@ -24,5 +24,14 @@ def get_menu_model(request: Request, db: Session = Depends(get_db)) -> Menu:
 
 def get_submenu_model(request: Request, db: Session = Depends(get_db)) -> SubMenu:
     path_id = request.path_params.get("submenu_id")
-    model = crud.menu.get(db=db, id_=path_id, in_db=True)
+    model = crud.submenu.get(db=db, id_=path_id, in_db=True)
     return model
+
+
+def get_menu_id(request: Request) -> Any:
+    return request.path_params.get("menu_id")
+
+
+def get_submenu_id(request: Request) -> Any:
+    return request.path_params.get("submenu_id")
+

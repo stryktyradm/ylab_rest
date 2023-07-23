@@ -35,7 +35,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return item
 
     def get_list(self, db: Session, **kwargs: dict) -> list[ReadSchemaType]:
-        db_obj_list = db.query(self.model).filter(**kwargs).all()
+        db_obj_list = db.query(self.model).filter_by(**kwargs).all()
         item_list = [self.process_data_from_db(obj) for obj in db_obj_list]
         return item_list
 

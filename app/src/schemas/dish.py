@@ -14,6 +14,7 @@ class DishCreate(DishBase):
 
 class DishRead(DishBase):
     id: str
+    price: str
 
 
 class DishUpdate(DishBase):

@@ -9,8 +9,8 @@ class CRUDMenu(CRUDBase[Menu, MenuCreate, MenuUpdate]):
     def process_data_from_db(self, menu_obj: Menu):
         data = {
             **jsonable_encoder(menu_obj),
-            "submenus_count": len(menu_obj.sub_menus),
-            "dishes_count": sum([len(submenu.dishes) for submenu in menu_obj.sub_menus])
+            "submenus_count": len(menu_obj.submenus),
+            "dishes_count": sum([len(submenu.dishes) for submenu in menu_obj.submenus])
         }
         return self.schema.parse_obj(data)
 
