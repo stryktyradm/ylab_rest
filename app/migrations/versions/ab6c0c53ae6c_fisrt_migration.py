@@ -1,8 +1,8 @@
 """fisrt migration
 
-Revision ID: fad554637a38
+Revision ID: ab6c0c53ae6c
 Revises: 
-Create Date: 2023-07-23 23:41:02.403665
+Create Date: 2023-07-24 19:36:06.551407
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'fad554637a38'
+revision = 'ab6c0c53ae6c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,7 +22,8 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=60), nullable=False),
     sa.Column('description', sa.String(), nullable=True),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('id')
     )
     op.create_table('submenu',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -30,7 +31,8 @@ def upgrade() -> None:
     sa.Column('description', sa.String(), nullable=True),
     sa.Column('menu_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['menu_id'], ['menu.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('id')
     )
     op.create_table('dish',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -39,7 +41,8 @@ def upgrade() -> None:
     sa.Column('price', sa.Float(), nullable=False),
     sa.Column('submenu_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['submenu_id'], ['submenu.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('id')
     )
     # ### end Alembic commands ###
 
