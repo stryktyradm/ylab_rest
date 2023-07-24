@@ -3,6 +3,23 @@
 * [Docker](https://www.docker.com/).
 * [Docker Compose](https://docs.docker.com/compose/install/).
 
+The project is launched with test environment variables that can be found in the file .env in the root directory of the project
+
+[.env](./.env)
+
+Example:
+
+```shell
+# Backend
+PROJECT_NAME=name_project
+
+# Postgres
+POSTGRES_SERVER=db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=pass
+POSTGRES_DB=app
+```
+
 ## Run in docker compose.
 
 *[INFO] for docker compose v1, use the commands below with the following syntax*
