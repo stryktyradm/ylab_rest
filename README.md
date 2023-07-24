@@ -46,9 +46,9 @@ docker compose up -d
 
 #### 3) After launching all the services to demonstrate the work and interaction with the API service, you can open the following address in the browser window:
 
-[127.0.0.1:8000](127.0.0.1:8000)
+[127.0.0.1:8000](http://127.0.0.1:8000)
 or
-[localhost:8000](localhost:8000)
+[localhost:8000](http://localhost:8000)
 
 
 #### 4) Stop previously running services
