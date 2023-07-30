@@ -1,15 +1,22 @@
+import os
 from typing import Optional, Dict, Any
 
+from dotenv import load_dotenv
 from pydantic import BaseSettings, PostgresDsn, validator
+
+BASEDIR: str = os.path.abspath(
+    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+)
+load_dotenv(os.path.join(BASEDIR, ".env"))
 
 
 class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str
-    POSTGRES_SERVER: str
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
-    POSTGRES_DB: str
+    POSTGRES_SERVER: str = os.getenv("POSTGRES_SERVER", default="localhost")
+    POSTGRES_USER: str = os.getenv("POSTGRES_USER", default="postgres")
+    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", default="pass")
+    POSTGRES_DB: str = os.getenv("POSTGRES_DB", default="app")
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn]
 
     @validator("SQLALCHEMY_DATABASE_URI", pre=True)
