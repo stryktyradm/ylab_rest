@@ -13,7 +13,9 @@ class Menu(Base):
     title: Mapped[str] = mapped_column(String(60))
     description: Mapped[Optional[str]]
 
-    submenus: Mapped[List["SubMenu"]] = relationship(back_populates="menu", cascade='all, delete')
+    submenus: Mapped[List["SubMenu"]] = relationship(
+        back_populates="menu", cascade='all, delete', lazy='joined'
+    )
 
 
 class SubMenu(Base):
@@ -25,7 +27,9 @@ class SubMenu(Base):
     menu_id: Mapped[int] = mapped_column(ForeignKey('menu.id'), nullable=False)
 
     menu: Mapped["Menu"] = relationship(back_populates="submenus")
-    dishes: Mapped[List["Dish"]] = relationship(back_populates="submenu", cascade='all, delete')
+    dishes: Mapped[List["Dish"]] = relationship(
+        back_populates="submenu", cascade='all, delete', lazy="joined"
+    )
 
 
 class Dish(Base):
