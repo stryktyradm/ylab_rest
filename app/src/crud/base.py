@@ -23,7 +23,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return self.schema.parse_obj(jsonable_encoder(item))
 
     def get(self, db: Session, id_: Any, in_db: bool = False) -> ReadSchemaType | ModelType:
-        db_obj = db.query(self.model).get(id_)
+        db_obj = db.get(self.model, id_)
         if not db_obj:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
