@@ -13,4 +13,6 @@ COPY . /app/
 
 RUN bash -c "chmod +x prestart.sh"
 
+RUN bash -c "chmod +x test-start.sh"
+
 ENV PYTHONPATH=.
