@@ -8,8 +8,10 @@ def test_root(client: TestClient, get_db: Session):
     test_query = text(
         "SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public';"
     )
-    row = get_db.execute(test_query)
+    rows = get_db.execute(test_query)
     response = client.get("/")
     assert response.status_code == 200
-    for table_name in row.fetchall():
-        assert table_name[0] in db_tables
+    fetched_tables = [row[0] for row in rows.fetchall()]
+    for table_name in db_tables:
+        assert table_name in fetched_tables
+

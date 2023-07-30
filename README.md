@@ -72,7 +72,7 @@ docker logs tests_app
 
 #### also, the test results are saved in an html file format, which after starting the container can be found in the following path:
 
-*/app/tests-reports/report.html*
+*./app/tests-reports/report.html*
 
 #### this file can be opened in the browser or in the IDE (the best option)
 
