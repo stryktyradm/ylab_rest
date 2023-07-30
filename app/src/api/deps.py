@@ -34,4 +34,3 @@ def get_menu_id(request: Request) -> Any:
 
 def get_submenu_id(request: Request) -> Any:
     return request.path_params.get("submenu_id")
-
