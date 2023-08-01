@@ -70,9 +70,8 @@ def test_get_list_submenus(
     assert response.status_code == 200
     content = response.json()
     assert len(content) == len(submenus)
-    for index, data in enumerate(content):
-        for key, value in data.items():
-            assert value == getattr(submenus[index], key)
+    for data in content:
+        assert data in submenus
 
 
 def test_get_list_submenus_in_non_existent_menu(

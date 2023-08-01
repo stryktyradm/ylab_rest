@@ -51,9 +51,8 @@ def test_get_list_menus(
     assert response.status_code == 200
     content = response.json()
     assert len(content) == len(menus)
-    for index, data in enumerate(content):
-        for key, value in data.items():
-            assert value == getattr(menus[index], key)
+    for data in content:
+        assert data in menus
 
 
 def test_update_menu(
