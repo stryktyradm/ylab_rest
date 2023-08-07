@@ -16,7 +16,7 @@ services:
       retries: 100
 
   cache:
-    container_name: fastapi_cache
+    container_name: test_cache
     image: redis
     ports:
       - 6379:6379
