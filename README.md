@@ -10,14 +10,19 @@ The project is launched with test environment variables that can be found in the
 Example:
 
 ```shell
-# Backend
-PROJECT_NAME=name_project
+PROJECT_NAME=ylab_project
 
 # Postgres
 POSTGRES_SERVER=db
+POSTGRES_PORT=5432
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=pass
 POSTGRES_DB=app
+
+# Redis
+REDIS_HOST=cache
+REDIS_PORT=6379
+REDIS_CACHE_TIME=3600
 ```
 
 ## Run in docker compose.
