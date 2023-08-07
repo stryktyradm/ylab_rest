@@ -1,36 +1,34 @@
-from typing import Generator, Any
-
-from fastapi import Request, Depends
-from sqlalchemy.orm import Session
-
-from src import crud
-from src.db.session import SessionLocal
-from src.models import Menu, SubMenu
-
-
-def get_db() -> Generator:
-    try:
-        db = SessionLocal()
-        yield db
-    finally:
-        db.close()
+from fastapi import Depends, Request
+from src import models
+from src.repository import (
+    MenuCRUDRepository,
+    SubMenuCRUDRepository,
+    get_menu_repository,
+    get_submenu_repository,
+)
 
 
-def get_menu_model(request: Request, db: Session = Depends(get_db)) -> Menu:
-    path_id = request.path_params.get("menu_id")
-    model = crud.menu.get(db=db, id_=path_id, in_db=True)
-    return model
+async def get_menu_model(
+    request: Request,
+    repo: MenuCRUDRepository = Depends(get_menu_repository)
+) -> models.Menu:
+    path_id = request.path_params.get('menu_id')
+    menu = await repo.get(id_=path_id)
+    return menu
 
 
-def get_submenu_model(request: Request, db: Session = Depends(get_db)) -> SubMenu:
-    path_id = request.path_params.get("submenu_id")
-    model = crud.submenu.get(db=db, id_=path_id, in_db=True)
-    return model
+async def get_submenu_model(
+    request: Request,
+    repo: SubMenuCRUDRepository = Depends(get_submenu_repository)
+) -> models.SubMenu:
+    path_id = request.path_params.get('submenu_id')
+    submenu = await repo.get(id_=path_id)
+    return submenu
 
 
-def get_menu_id(request: Request) -> Any:
-    return request.path_params.get("menu_id")
+def get_menu_id(request: Request) -> str:
+    return request.path_params.get('menu_id')
 
 
-def get_submenu_id(request: Request) -> Any:
-    return request.path_params.get("submenu_id")
+def get_submenu_id(request: Request) -> str:
+    return request.path_params.get('submenu_id')

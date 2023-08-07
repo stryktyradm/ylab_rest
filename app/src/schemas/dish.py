@@ -5,7 +5,7 @@ from pydantic.types import condecimal
 class DishBase(BaseModel):
     title: str | None
     description: str | None
-    price: condecimal(decimal_places=2)
+    price: condecimal(decimal_places=2) | None  # type: ignore
 
 
 class DishCreate(DishBase):

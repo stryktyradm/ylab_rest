@@ -1,51 +1,55 @@
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session
-
-from src import crud
-from src.api.deps import get_db, get_menu_model, get_menu_id
-from src.models import Menu
-from src.schemas import SubMenuCreate, SubMenuRead, SubMenuUpdate
+from src import models, schemas
+from src.api.deps import get_menu_id, get_menu_model
+from src.service import SubMenuService, get_submenu_service
 
 router = APIRouter()
 
 
-@router.get("/{submenu_id}", response_model=SubMenuRead, status_code=status.HTTP_200_OK)
-def get_submenu(submenu_id: int, db: Session = Depends(get_db)) -> SubMenuRead:
-    response = crud.submenu.get(db=db, id_=submenu_id)
+@router.get('/{submenu_id}', response_model=schemas.SubMenuRead, status_code=status.HTTP_200_OK)
+async def get_submenu(
+    submenu_id: str,
+    service: SubMenuService = Depends(get_submenu_service)
+) -> schemas.SubMenuRead:
+    response = await service.get_item(id_=submenu_id)
     return response
 
 
-@router.get("/", response_model=list[SubMenuRead], status_code=status.HTTP_200_OK)
-def get_submenus(
-    db: Session = Depends(get_db),
-    menu_id: int = Depends(get_menu_id)
-) -> list[SubMenuRead]:
-    response = crud.submenu.get_list(db=db, menu_id=menu_id)
+@router.get('/', response_model=list[schemas.SubMenuRead], status_code=status.HTTP_200_OK)
+async def get_submenus(
+    menu_id: str = Depends(get_menu_id),
+    service: SubMenuService = Depends(get_submenu_service)
+) -> list[schemas.SubMenuRead]:
+    response = await service.list_items(menu_id=menu_id)
     return response
 
 
-@router.post("/", response_model=SubMenuRead, status_code=status.HTTP_201_CREATED)
-def create_submenu(
-    item_in: SubMenuCreate,
-    db: Session = Depends(get_db),
-    menu_model: Menu = Depends(get_menu_model)
-) -> SubMenuRead:
-    response = crud.submenu.create(db=db, obj_in=item_in, menu_id=menu_model.id)
+@router.post('/', response_model=schemas.SubMenuRead, status_code=status.HTTP_201_CREATED)
+async def create_submenu(
+    item_in: schemas.SubMenuCreate,
+    menu: models.Menu = Depends(get_menu_model),
+    service: SubMenuService = Depends(get_submenu_service)
+) -> schemas.SubMenuRead:
+    response = await service.create_item(obj_in=item_in, menu_id=menu.id)
     return response
 
 
-@router.patch("/{submenu_id}", response_model=SubMenuRead)
-def update_submenu(
-    submenu_id: int,
-    item_id: SubMenuUpdate,
-    db: Session = Depends(get_db)
-) -> SubMenuRead:
-    response = crud.submenu.update(db=db, id_=submenu_id, obj_in=item_id)
+@router.patch('/{submenu_id}', response_model=schemas.SubMenuRead)
+async def update_submenu(
+    submenu_id: str,
+    item_in: schemas.SubMenuUpdate,
+    service: SubMenuService = Depends(get_submenu_service)
+) -> schemas.SubMenuRead:
+    response = await service.update_item(id_=submenu_id, obj_in=item_in)
     return response
 
 
-@router.delete("/{submenu_id}")
-def delete_submenu(submenu_id: int, db: Session = Depends(get_db)) -> JSONResponse:
-    response = crud.submenu.delete(db=db, id_=submenu_id)
+@router.delete('/{submenu_id}')
+async def delete_submenu(
+    submenu_id: str,
+    menu: models.Menu = Depends(get_menu_model),
+    service: SubMenuService = Depends(get_submenu_service)
+) -> JSONResponse:
+    response = await service.delete_item(id_=submenu_id, menu_id=menu.id)
     return response

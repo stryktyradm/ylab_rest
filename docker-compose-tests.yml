@@ -15,6 +15,19 @@ services:
       timeout: 10s
       retries: 100
 
+  cache:
+    container_name: fastapi_cache
+    image: redis
+    ports:
+      - 6379:6379
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 10s
+      retries: 200
+
   test_app:
     container_name: tests_app
     build:

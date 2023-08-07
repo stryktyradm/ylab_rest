@@ -1,52 +1,31 @@
-from typing import Generator
-
 import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
-
-from src.core.config import settings
+import pytest_asyncio
+from sqlalchemy.ext.asyncio import AsyncSession
 from src.db.base import Base
-from src.main import app
+from src.db.session import async_engine, async_session
 
 
-@pytest.fixture(scope="module")
-def ids() -> dict[str, int]:
+@pytest.fixture(scope='module')
+def ids() -> dict[str, str]:
     id_s = {
-        "menu": 0,
-        "submenu": 0,
-        "dish": 0
+        'menu': '',
+        'submenu': '',
+        'dish': '',
+        'dish_2': '',
     }
     return id_s
 
 
-@pytest.fixture(scope="module")
-def client() -> TestClient:
-    with TestClient(app) as t_client:
-        yield t_client
+@pytest_asyncio.fixture(scope='module', autouse=True)
+async def test_db() -> AsyncSession:
+    async with async_session() as session:
 
+        async with async_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
 
-@pytest.fixture(scope="module", autouse=True)
-def get_db_override() -> None:
-    def get_test_db() -> Generator:
-        yield get_db
-
-    app.dependency_overrides[get_db] = get_test_db
-
-
-@pytest.fixture(scope="module", autouse=True)
-def reset_dependency_overrides() -> Generator:
-    yield
-    app.dependency_overrides = {}
-
-
-@pytest.fixture(scope="module", autouse=True)
-def get_db() -> Session:
-    engine = create_engine(settings.SQLALCHEMY_DATABASE_URI)
-    testing_session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    with testing_session() as session:
-        Base.metadata.create_all(engine)
         yield session
 
-    Base.metadata.drop_all(engine)
-    engine.dispose()
+    async with async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+
+    await async_engine.dispose()

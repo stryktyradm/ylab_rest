@@ -1,9 +1,9 @@
 import logging
 
-from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 from sqlalchemy.sql import text
-
-from src.db.session import SessionLocal
+from src.db.cache import get_cache_connection
+from src.db.session import async_session
+from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -18,20 +18,22 @@ wait_seconds = 1
     before=before_log(logger, logging.INFO),
     after=after_log(logger, logging.WARN),
 )
-def init() -> None:
+async def init() -> None:
     try:
-        db = SessionLocal()
-        db.execute(text('SELECT 1'))
+        db = async_session()
+        await db.run_sync(text('SELECT 1'))
+        cache = await get_cache_connection()
+        await cache.info()
     except Exception as e:
         logger.error(e)
         raise e
 
 
 def main() -> None:
-    logger.info("Initializing DB service")
+    logger.info('Initializing DB/Cache service')
     init()
-    logger.info("Service DB finished initializing")
+    logger.info('Service DB/Cache finished initializing')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
