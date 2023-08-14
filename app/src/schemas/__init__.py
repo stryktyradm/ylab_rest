@@ -1,3 +1,3 @@
-from .dish import DishCreate, DishRead, DishUpdate
-from .menu import MenuCreate, MenuRead, MenuUpdate
-from .submenu import SubMenuCreate, SubMenuRead, SubMenuUpdate
+from src.schemas.dish import DishCreate, DishRead, DishUpdate
+from src.schemas.menu import NestedMenu, MenuCreate, MenuRead, MenuUpdate
+from src.schemas.submenu import NestedSubMenu, SubMenuCreate, SubMenuRead, SubMenuUpdate

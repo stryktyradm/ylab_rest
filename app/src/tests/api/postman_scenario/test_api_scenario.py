@@ -1,18 +1,20 @@
 import pytest
 from httpx import AsyncClient
-from src.tests.utils import random_float_number, random_lower_string
+from src.tests.utils import (
+    create_menu_data,
+    create_submenu_data,
+    random_float_number,
+    random_lower_string,
+)
 
 
 @pytest.mark.order(1)
 async def test_create_menu(
     client: AsyncClient, ids: dict[str, str], get_test_url: dict[str, str]
 ):
-    data = {
-        'title': random_lower_string(),
-        'description': random_lower_string()
-    }
+    data = create_menu_data()
     url = get_test_url['menu'].format('')
-    response = await client.post(url=url, json=data)
+    response = await client.post(url=url, json=data.dict())
     ids['menu'] = response.json()['id']
     assert response.status_code == 201
     content = response.json()
@@ -23,12 +25,9 @@ async def test_create_menu(
 async def test_create_submenu(
     client: AsyncClient, ids: dict, get_test_url: dict[str, str]
 ):
-    data = {
-        'title': random_lower_string(),
-        'description': random_lower_string()
-    }
+    data = create_submenu_data()
     url = get_test_url['submenu'].format(ids['menu'], '')
-    response = await client.post(url=url, json=data)
+    response = await client.post(url=url, json=data.dict())
     ids['submenu'] = response.json()['id']
     assert response.status_code == 201
     content = response.json()

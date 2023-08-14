@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, BackgroundTasks, Depends, status
 from fastapi.responses import JSONResponse
 from src import models, schemas
 from src.api.deps import get_menu_id, get_menu_model
@@ -10,9 +10,10 @@ router = APIRouter()
 @router.get('/{submenu_id}', response_model=schemas.SubMenuRead, status_code=status.HTTP_200_OK)
 async def get_submenu(
     submenu_id: str,
+    menu_id: str = Depends(get_menu_id),
     service: SubMenuService = Depends(get_submenu_service)
 ) -> schemas.SubMenuRead:
-    response = await service.get_item(id_=submenu_id)
+    response = await service.get_item(id_=submenu_id, menu_id=menu_id)
     return response
 
 
@@ -28,10 +29,13 @@ async def get_submenus(
 @router.post('/', response_model=schemas.SubMenuRead, status_code=status.HTTP_201_CREATED)
 async def create_submenu(
     item_in: schemas.SubMenuCreate,
+    background_task: BackgroundTasks,
     menu: models.Menu = Depends(get_menu_model),
     service: SubMenuService = Depends(get_submenu_service)
 ) -> schemas.SubMenuRead:
-    response = await service.create_item(obj_in=item_in, menu_id=menu.id)
+    response = await service.create_item(
+        obj_in=item_in, back_task=background_task, menu_id=menu.id
+    )
     return response
 
 
@@ -39,17 +43,23 @@ async def create_submenu(
 async def update_submenu(
     submenu_id: str,
     item_in: schemas.SubMenuUpdate,
+    menu_id: str = Depends(get_menu_id),
     service: SubMenuService = Depends(get_submenu_service)
 ) -> schemas.SubMenuRead:
-    response = await service.update_item(id_=submenu_id, obj_in=item_in)
+    response = await service.update_item(
+        id_=submenu_id, obj_in=item_in, menu_id=menu_id
+    )
     return response
 
 
 @router.delete('/{submenu_id}')
 async def delete_submenu(
     submenu_id: str,
+    background_task: BackgroundTasks,
     menu: models.Menu = Depends(get_menu_model),
     service: SubMenuService = Depends(get_submenu_service)
 ) -> JSONResponse:
-    response = await service.delete_item(id_=submenu_id, menu_id=menu.id)
+    response = await service.delete_item(
+        id_=submenu_id, back_task=background_task, menu_id=menu.id
+    )
     return response

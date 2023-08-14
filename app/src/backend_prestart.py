@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from sqlalchemy.sql import text
@@ -20,8 +21,8 @@ wait_seconds = 1
 )
 async def init() -> None:
     try:
-        db = async_session()
-        await db.run_sync(text('SELECT 1'))
+        async with async_session() as db_session:
+            await db_session.execute(text('SELECT 1'))
         cache = await get_cache_connection()
         await cache.info()
     except Exception as e:
@@ -29,11 +30,11 @@ async def init() -> None:
         raise e
 
 
-def main() -> None:
+async def main() -> None:
     logger.info('Initializing DB/Cache service')
-    init()
+    await init()
     logger.info('Service DB/Cache finished initializing')
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())

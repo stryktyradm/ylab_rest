@@ -1,5 +1,5 @@
 from fastapi import Depends, Request
-from src import models
+from src import schemas
 from src.repository import (
     MenuCRUDRepository,
     SubMenuCRUDRepository,
@@ -11,7 +11,7 @@ from src.repository import (
 async def get_menu_model(
     request: Request,
     repo: MenuCRUDRepository = Depends(get_menu_repository)
-) -> models.Menu:
+) -> schemas.MenuRead:
     path_id = request.path_params.get('menu_id')
     menu = await repo.get(id_=path_id)
     return menu
@@ -20,7 +20,7 @@ async def get_menu_model(
 async def get_submenu_model(
     request: Request,
     repo: SubMenuCRUDRepository = Depends(get_submenu_repository)
-) -> models.SubMenu:
+) -> schemas.SubMenuRead:
     path_id = request.path_params.get('submenu_id')
     submenu = await repo.get(id_=path_id)
     return submenu

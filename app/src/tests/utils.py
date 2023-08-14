@@ -2,7 +2,7 @@ import random
 import string
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from src import models, schemas
+from src import schemas
 from src.repository import (
     get_dish_repository,
     get_menu_repository,
@@ -51,14 +51,14 @@ def create_dish_data() -> schemas.DishCreate:
     return dish_in
 
 
-async def create_menu(db: AsyncSession) -> models.Menu:
+async def create_menu(db: AsyncSession) -> schemas.MenuRead:
     menu_in = create_menu_data()
     repo = await get_menu_repository(db=db)
     menu = await repo.create(obj_in=menu_in)
     return menu
 
 
-async def create_multi_menus(db: AsyncSession, count: int = 3) -> list[models.Menu]:
+async def create_multi_menus(db: AsyncSession, count: int = 3) -> list[schemas.MenuRead]:
     menus = list()
     for _ in range(count):
         menu = await create_menu(db)
@@ -66,7 +66,7 @@ async def create_multi_menus(db: AsyncSession, count: int = 3) -> list[models.Me
     return menus
 
 
-async def create_submenu(db: AsyncSession) -> tuple[models.Menu, models.SubMenu]:
+async def create_submenu(db: AsyncSession) -> tuple[schemas.MenuRead, schemas.SubMenuRead]:
     menu = await create_menu(db=db)
     submenu_in = create_submenu_data()
     repo = await get_submenu_repository(db=db)
@@ -76,7 +76,7 @@ async def create_submenu(db: AsyncSession) -> tuple[models.Menu, models.SubMenu]
 
 async def create_multi_submenus(
     db: AsyncSession, count: int = 3
-) -> tuple[models.Menu, list[models.SubMenu]]:
+) -> tuple[schemas.MenuRead, list[schemas.SubMenuRead]]:
     menu = await create_menu(db=db)
     submenus = list()
     for _ in range(count):
@@ -87,7 +87,9 @@ async def create_multi_submenus(
     return menu, submenus
 
 
-async def create_dish(db: AsyncSession) -> tuple[models.Menu, models.SubMenu, models.Dish]:
+async def create_dish(
+    db: AsyncSession
+) -> tuple[schemas.MenuRead, schemas.SubMenuRead, schemas.DishRead]:
     menu, submenu = await create_submenu(db=db)
     dish_in = create_dish_data()
     repo = await get_dish_repository(db=db)
@@ -97,7 +99,7 @@ async def create_dish(db: AsyncSession) -> tuple[models.Menu, models.SubMenu, mo
 
 async def create_multi_dishes(
     db: AsyncSession, count: int = 3
-) -> tuple[models.Menu, models.SubMenu, list[models.Dish]]:
+) -> tuple[schemas.MenuRead, schemas.SubMenuRead, list[schemas.DishRead]]:
     menu, submenu = await create_submenu(db=db)
     dishes = list()
     for _ in range(count):
@@ -106,3 +108,31 @@ async def create_multi_dishes(
         dish = await repo.create(obj_in=dish_in, submenu_id=submenu.id)
         dishes.append(dish)
     return menu, submenu, dishes
+
+
+async def create_menu_with_nested_data(db: AsyncSession) -> list[schemas.NestedMenu]:
+    menus = []
+    menu_repo = await get_menu_repository(db=db)
+    submenu_repo = await get_submenu_repository(db=db)
+    dish_repo = await get_dish_repository(db=db)
+    for i in range(2):
+        menu_data = create_menu_data()
+        menu = await menu_repo.create(obj_in=menu_data)
+        submenus = []
+        for j in range(2):
+            submenu_data = create_submenu_data()
+            submenu = await submenu_repo.create(obj_in=submenu_data, menu_id=menu.id)
+            dishes = []
+            for k in range(3):
+                dish_data = create_dish_data()
+                dish = await dish_repo.create(obj_in=dish_data, submenu_id=submenu.id)
+                dishes.append(dish)
+            submenu_with_dishes = schemas.NestedSubMenu(
+                id=submenu.id, title=submenu.title, description=submenu.description, all_dishes=dishes
+            )
+            submenus.append(submenu_with_dishes)
+        menu_with_submenus_and_dishes = schemas.NestedMenu(
+            id=menu.id, title=menu.title, description=menu.description, all_submenus=submenus
+        )
+        menus.append(menu_with_submenus_and_dishes)
+    return menus

@@ -21,6 +21,6 @@ class BaseCacheRepository:
     async def clear(self, key: str):
         await self.cache.delete(key)
 
-    async def multi_clear(self, keys: list):
-        for key in keys:
-            await self.cache.delete(key)
+    async def multi_clear(self, pattern: str, root: str):
+        keys = await self.cache.keys(pattern)
+        await self.cache.delete(*keys, root)

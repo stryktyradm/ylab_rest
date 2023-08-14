@@ -1,9 +1,15 @@
 from pydantic import BaseModel
+from src.schemas.submenu import NestedSubMenu
 
 
 class MenuBase(BaseModel):
     title: str | None
     description: str | None
+
+
+class NestedMenu(MenuBase):
+    id: str
+    all_submenus: list[NestedSubMenu]
 
 
 class MenuCreate(MenuBase):
